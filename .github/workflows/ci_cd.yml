@@ -1,0 +1,60 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+env:
+  PYTHON_VERSION: "3.10"
+  POETRY_VERSION: "1.4.0"
+
+jobs:
+  quality-check:
+    name: Quality Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Set Up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install Flake8
+        run: pip install flake8
+
+      - name: Run Flake8
+        run: flake8 .
+
+  unit-tests:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Set Up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install Poetry
+        run: |
+          pip install poetry
+          poetry --version
+
+      - name: Configure Poetry
+        run: |
+          poetry config virtualenvs.create false
+          poetry install --no-interaction --no-root
+
+      - name: Run Unit Tests with Coverage
+        run: |
+          poetry run coverage run -m pytest
+          poetry run coverage report
+          poetry run coverage xml
