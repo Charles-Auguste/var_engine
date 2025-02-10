@@ -1,0 +1,65 @@
+.pbi
+*.pyc
+*.swp
+build/
+doc/_build/
+doc/build/
+doc/backlog/backlog_monitoring.xlsx
+doc/backlog/.backlog_raw.xlsx
+doc/backlog/.backlog_style.xlsx
+.cache
+doc/.cache
+doc/backlog/.cache
+dist/
+__pycache__
+.eggs
+version.txt
+*/version.txt
+ig_var_api.egg*
+ig_var_pkg.egg*
+ig_var_streamlit.egg*
+tmp/
+test.jpg
+*coverage.xml
+ansible/ghostdriver.log
+ansible/*.retry
+ansible/roles/
+bin/
+lib/
+pip-selfcheck.json
+pyvenv.cfg
+.coverage
+.coverage.*
+dump.rdb
+
+# dotenv
+.env.local
+
+# virtualenv
+.venv
+env/
+venv/
+
+# MacOS
+.DS_STORE
+
+# Idea
+.idea/
+
+# VSCode
+/.vscode
+
+# pyenv
+celerybeat-schedule*
+
+# node
+node_modules/
+/.pnp
+.pnp.js
+
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+/ig_var_data/
+ig_var_pkg/data/example/inputs/
+.python-version

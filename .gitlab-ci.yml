@@ -1,0 +1,60 @@
+variables:
+  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+  POETRY_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pypoetry"
+  POETRY_VIRTUALENVS_IN_PROJECT: "false"
+  PYTHON_VERSION: "3.10"
+  POETRY_VERSION: "1.4.0"
+
+stages:
+  - Tests
+  - Build
+
+workflow:
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "master"'
+      when: always
+    - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master"'
+      when: always
+    - when: never
+
+
+.install_poetry: &install_poetry
+  before_script:
+    - apt update && apt install -y curl
+    - curl -sSL https://install.python-poetry.org | python3 - --version ${POETRY_VERSION}
+    - export PATH="$HOME/.local/bin:$PATH"
+    - poetry config virtualenvs.create false
+    - poetry install
+
+Quality Check:
+  stage: Tests
+  image: 
+    name: python:${PYTHON_VERSION}-slim
+    entrypoint: [""]
+  script:
+    - pip install flake8
+    - flake8 .
+
+Unitests:
+  <<: *install_poetry
+  stage: Tests
+  image: 
+    name: python:${PYTHON_VERSION}-slim
+    entrypoint: [""]
+  script:
+    - poetry run coverage run -m pytest
+    - poetry run coverage report
+    - poetry run coverage xml
+  coverage: '/TOTAL.*\s+(\d+%)$/'
+
+Deploy Package:
+  <<: *install_poetry
+  stage: Build
+  needs: ["Quality Check", "Unitests"]
+  image: 
+    name: python:${PYTHON_VERSION}-slim
+    entrypoint: [""]
+  script:
+    - poetry build
+    - poetry config repositories.gitlab ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/pypi
+    - poetry publish --repository gitlab -u gitlab-ci-token -p ${CI_JOB_TOKEN}
